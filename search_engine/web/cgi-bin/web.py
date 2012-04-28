@@ -1,5 +1,6 @@
 import sys, cgi
 import cgi, search_engine.lib.html as html
+from search_engine.lib.webgraph import WebGraph
 
 form = cgi.FieldStorage()
 
@@ -14,39 +15,39 @@ if dim == None:
 else:
    dim = map(lambda x: int(x), dim)
 
-if v == None:
-    v = [0 for i in dim]
-else:
+if v != None:
    v = map(lambda x: int(x), v)
 
-def get_link(v):
+graph = WebGraph(dim, v)
+
+def get_link(graph):
     s = './web.py'
-    for i, x in enumerate(dim):
+    for i, x in enumerate(graph.dimensions()):
         if i == 0:
             s += '?'
         else:
             s += '&'
         s += 'd=' + str(x)
         
-    for i, x in enumerate(v):
+    for i, x in enumerate(graph.current()):
         s += '&v=' + str(x)
         
     return s
 
-def update(v, k, d):
-    for i, x in enumerate(v):
-        if i == k:
-            yield (x + d) % dim[i]
-        else:
-            yield x
-
 html.header()
-print '<form action="index.py"><input name="s" type="submit" value="search"></form>'
+print """
+<table>
+    <tr valign="top">
+        <td><form action="index.py"><input name="s" type="submit" value="search"></form></td>
+        <td><form action="statistic.py"><input name="s" type="submit" value="statistic"></form></td>
+        <td><b>web model</b></td>
+    </tr>
+<table>"""
 #show vector v and links to connected vectors
-for i, x in enumerate(v):
+for i, x in enumerate(graph.current()):
     print '<div>'
-    html.a(get_link(update(v, i, -1)), '<<')    
-    print '%s (%s)' % (x, dim[i])
-    html.a(get_link(update(v, i, 1)), '>>')
+    html.a(get_link(graph.prev(i)), '<<')
+    print '%s (%s)' % (x, graph.dimensions()[i])
+    html.a(get_link(graph.next(i)), '>>')
     print '</div>'
 html.footer()

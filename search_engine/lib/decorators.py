@@ -19,6 +19,7 @@ def timeit(method):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-        print logging.info("%s %f", method.__name__, te-ts)
+        print "%s %f" % (method.__name__, te-ts)
+        logging.info("%s %f", method.__name__, te-ts)
         return result
     return timed

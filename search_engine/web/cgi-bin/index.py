@@ -10,7 +10,11 @@ if not query:
     query = ''    
 
 print """
-<div/><a href="statistic.py">statistic</a>&nbsp;&nbsp;&nbsp;<a href="web.py">web model</a><div>
+<div/>
+    <a href="index.py"><b>search</b></a>&nbsp;&nbsp;&nbsp;
+    <a href="statistic.py">statistic</a>&nbsp;&nbsp;&nbsp;
+    <a href="web.py">web model</a>
+<div><br/>
 <form method="post">
 <input name="q" value="%s">
 <input name="s" type="submit" value="search">

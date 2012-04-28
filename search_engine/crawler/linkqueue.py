@@ -5,36 +5,47 @@ class LinkQueue:
         self._count = 0
         self._count_done = 0
         self._queue = collections.deque()
+        self._depth_queue = collections.deque()
         self._index = index
         self._locker = threading.Lock()
-        self.n = 0
+        self._loaging_pages = collections.deque()
 
-    def _put(self, url):
-        if self._queue.count(url) == 0 and not self._index.has_page(url):
-            self._queue.append(url)            
+    def _put(self, url, depth):
+        #if url not in self._queue and url not in self._loaging_pages and not self._index.has_page(url):
+        if url not in self._queue and url not in self._loaging_pages:
+            self._queue.append(url)
+            self._depth_queue.append(depth)
             self._count += 1                
             self._count_done += 1
-            self.n += 1
 
-    def extend(self, urls):
+    def extend(self, urls, current_depth):
         self._locker.acquire()
         try:
             for url in urls:                
-                self._put(url)
+                self._put(url, current_depth + 1)
         finally:
             self._locker.release()
 
     def get(self):
         self._locker.acquire()
         try:
-            val = self._queue.popleft()
+            url = self._queue.popleft()
+            depth = self._depth_queue.popleft()
+            self._loaging_pages.append(url)
             self._count -= 1
-            return val
+            return url, depth
         finally:
             self._locker.release()
 
-    def done(self):
-        self._count_done -= 1        
+    def done(self, url):
+        self._locker.acquire()
+        try:
+            self._count_done -= 1
+            #if url in self._loaging_pages:
+                #self._loaging_pages.remove(url)
+        finally:
+            self._locker.release()
+
 
     def empty(self):
         return self._count_done <= 0

@@ -17,16 +17,27 @@ def print_common_statistic(index):
     print '</table>'
 
 def print_domains(index):
-    html.div('<b>hosts</b>')
+    html.div('<b>domains</b>')
     for h in index.hosts():
         print '<div>'
-        html.a(h, h)
+        html.a('http://'+h, h)
         print '</div>'
 
+def print_depth_statistic(index):
+    html.div('<b>depth statistic</b>')
+    print """<table>
+    <tr><td>depth</td><td>pages</td></tr>"""
+    for s in index.get_depth_stat():
+        print '<tr><td>%i</td><td>%i</td></tr>' % s
+    print '</table>'
 
 html.header()
 print """
-<div/><a href="index.py">search</a>&nbsp;&nbsp;&nbsp;<a href="web.py">web model</a><div><br/>
+<div/>
+    <a href="index.py">search</a>&nbsp;&nbsp;&nbsp;
+    <a href="statistic.py"><b>statistic</b></a>&nbsp;&nbsp;&nbsp;
+    <a href="web.py">web model</a>
+<div><br/>
 """
 try:
     index = IndexManager.get_proxy()
@@ -35,6 +46,8 @@ try:
     print_common_statistic(index)
     print '</td><td>'
     print_domains(index)
+    print '</td><td>'
+    print_depth_statistic(index)
     print '</td><tr/>'
     print '</table>'
     
